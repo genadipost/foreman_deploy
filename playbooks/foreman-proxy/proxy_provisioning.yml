@@ -1,0 +1,14 @@
+---
+- include: proxy.yml
+
+- name: Configure Foreman provisioning proxy
+  hosts: oo_proxies_to_config
+  roles:
+  - role: foreman_proxy_provisioning
+    hammer_client_host: "{{ groups.oo_first_master.0 }}"
+#    foreman_provisioning_dhcp_interface: ens33
+#    foreman_provisioning_dhcp_gateway: 192.168.227.2
+#    foreman_provisioning_dhcp_network: 192.168.227.0
+#    foreman_provisioning_dhcp_netmask: 255.255.255.0
+#    foreman_provisioning_dhcp_start: 192.168.227.132
+#    foreman_provisioning_dhcp_end: 192.168.227.250

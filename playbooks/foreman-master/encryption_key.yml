@@ -1,0 +1,6 @@
+---
+- name: Copy Foreman encryption_key for master hosts
+  hosts: oo_masters_to_config
+  roles:
+  - role: foreman_master_encryption_key
+    foreman_ca_host: "{{ groups.oo_first_master.0 }}"

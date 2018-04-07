@@ -1,0 +1,13 @@
+---
+- include: initialize_groups.yml
+
+- include: evaluate_groups.yml
+
+- hosts: localhost
+  tasks:
+   - name: 'Get encryption_key.rb'
+     shell: cat /etc/foreman/encryption_key.rb
+     delegate_to: "{{ groups.oo_first_master.0 }}"
+     register: encryption_key
+
+   - debug: msg="encryption_key.rb {{ encryption_key }}"

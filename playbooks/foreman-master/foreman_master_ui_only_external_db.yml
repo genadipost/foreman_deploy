@@ -1,0 +1,47 @@
+---
+- import_playbook: ../common/initialize_groups.yml
+
+- import_playbook: ../common/evaluate_groups.yml
+
+- import_playbook: certificates.yml
+
+- import_playbook: ../common/oauth.yml
+
+- hosts: oo_masters_to_config
+  roles:
+    - { role: genadipost.epel_repositories }
+    - { role: puppet_repositories }
+    - { role: foreman_repositories }
+    - role: foreman_installer
+      scenario: foreman
+      foreman_installer_options:
+#          - "--foreman-locations-enabled=true"
+#          - "--foreman-initial-location=A"
+#          - "--foreman-organizations-enabled=true"
+#          - "--foreman-initial-organization=A"
+          - "--foreman-db-manage=false"
+          - "--foreman-db-type={{ foreman_db_type }}"
+          - "--foreman-db-adapter={{ foreman_db_adapter }}"
+          - "--foreman-db-port={{ foreman_db_port }}"
+          - "--foreman-db-host={{ foreman_db_host }}"
+          - "--foreman-db-username={{ foreman_db_username }}"
+          - "--foreman-db-password={{ foreman_db_password }}"
+          - "--foreman-db-database={{ foreman_db_database }}"
+          - "--puppet-server-foreman-url=https://{{ foreman_puppet_public_hostname }}"
+          - "--foreman-proxy-foreman-base-url=https://{{ foreman_puppet_public_hostname }}"
+          - "--foreman-proxy-trusted-hosts={{ groups.oo_masters | default([]) | list | join(' --foreman-proxy-trusted-hosts=') }}"
+          - "--foreman-proxy-oauth-consumer-key={{ hostvars['localhost'].oauth_consumer_key.stdout }}"
+          - "--foreman-proxy-oauth-consumer-secret={{ hostvars['localhost'].oauth_consumer_secret.stdout }}"
+          - "--foreman-proxy-register-in-foreman=true"
+          - "--enable-foreman"
+#          - "--no-enable-foreman"
+          - "--enable-puppet"
+          - "--enable-foreman-proxy"
+          - "--puppet-server=false"
+          - "--puppet-server-ca=false"
+          - "--foreman-proxy-puppet=false"
+          - "--foreman-proxy-puppetca=false"
+          - "--foreman-proxy-dhcp=false"
+          - "--foreman-proxy-tftp=false"
+
+- import_playbook: encryption_key.yml

@@ -1,0 +1,34 @@
+---
+- name: 'Get smart proxy id'
+  shell: >
+    hammer --output json proxy info --name {{ foreman_provisioning_proxy_name }}
+  register: foreman_provisioning_smart_proxy_json
+  delegate_to: "{{ hammer_client_host }}"
+
+- name: 'Set smart proxy id'
+  set_fact:
+    foreman_provisioning_smart_proxy_json: "{{ foreman_provisioning_smart_proxy_json.stdout | from_json }}"
+  delegate_to: "{{ hammer_client_host }}"
+
+- name: 'Find subnet'
+  shell: >
+    hammer subnet info --name "{{ foreman_provisioning_dhcp_network }}/{{ foreman_provisioning_dhcp_network_prefix }}"
+  register: foreman_provisioning_subnet_return
+  ignore_errors: True
+  delegate_to: "{{ hammer_client_host }}"
+
+- name: 'Create subnet'
+  shell: >
+    hammer subnet create
+    --name "{{ foreman_provisioning_dhcp_network }}/{{ foreman_provisioning_dhcp_network_prefix }}"
+    --dhcp-id {{ foreman_provisioning_smart_proxy_json.Id }}
+    --tftp-id {{ foreman_provisioning_smart_proxy_json.Id }}
+    --from {{ foreman_provisioning_dhcp_start }}
+    --to {{ foreman_provisioning_dhcp_end }}
+    --network {{ foreman_provisioning_dhcp_network }}
+    --mask {{ foreman_provisioning_dhcp_netmask }}
+    --ipam "{{ foreman_ipam }}"
+    --gateway {{ foreman_provisioning_dhcp_gateway }}
+    --dns-primary {{ foreman_provisioning_dhcp_dns_primary }}
+  when: foreman_provisioning_subnet_return.stderr.find('not found') != -1
+  delegate_to: "{{ hammer_client_host }}"

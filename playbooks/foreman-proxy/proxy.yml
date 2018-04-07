@@ -1,0 +1,30 @@
+---
+- import_playbook: ../common/initialize_groups.yml
+
+- import_playbook: ../common/evaluate_groups.yml
+
+- import_playbook: certificates.yml
+
+- import_playbook: ../common/oauth.yml
+
+- name: Run foreman installer on proxy servers
+  hosts: oo_proxies_to_config
+  roles:
+    - { role: genadipost.epel_repositories }
+    - { role: genadipost.puppet_repositories }
+    - { role: genadipost.foreman_repositories }
+    - role: foreman_installer
+      scenario: foreman
+      foreman_installer_options:
+#          - "--foreman-proxy-foreman-base-url=https://{{ foreman_puppet_public_hostname }}:5443"
+          - "--foreman-proxy-foreman-base-url=https://{{ foreman_puppet_public_hostname }}"
+          - "--foreman-proxy-trusted-hosts={{ groups.oo_masters | default([]) | list | join(' --foreman-proxy-trusted-hosts=') }}"
+          - "--foreman-proxy-oauth-consumer-key={{ hostvars['localhost'].oauth_consumer_key.stdout }}"
+          - "--foreman-proxy-oauth-consumer-secret={{ hostvars['localhost'].oauth_consumer_secret.stdout }}"
+          - "--foreman-proxy-puppet=false"
+          - "--foreman-proxy-puppetca=false"
+          - "--no-enable-puppet"
+          - "--no-enable-foreman"
+          - "--enable-foreman-proxy"
+          - "--foreman-proxy-dhcp=false"
+          - "--foreman-proxy-tftp=false"

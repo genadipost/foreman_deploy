@@ -1,0 +1,10 @@
+---
+- include_tasks: "{{ ansible_os_family|lower }}_{{ foreman_repositories_environment }}_repos.yml"
+
+- name: 'Install foreman-release-scl'
+  yum:
+    name: foreman-release-scl
+    state: latest
+  tags:
+    - packages
+  when: ansible_os_family == 'RedHat'

@@ -1,0 +1,11 @@
+---
+- name: Create Foreman certificates for master hosts
+  hosts: oo_masters_to_config
+  roles:
+  - role: foreman_proxy_certificates
+    foreman_ca_host: "{{ groups.oo_first_master.0 }}"
+    dns_alt_names:
+      - puppet
+      - puppet.{{ ansible_domain }}
+      - "{{ foreman_web_public_hostname }}"
+      - "{{ foreman_puppet_public_hostname }}"

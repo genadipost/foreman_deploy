@@ -1,0 +1,18 @@
+---
+- include: initialize_groups.yml
+
+- include: evaluate_groups.yml
+
+- hosts: localhost
+  tasks:
+   - name: 'Get oauth-consumer-key'
+     shell: grep oauth_consumer_key /etc/foreman/settings.yaml | cut -d ' ' -f 2
+     delegate_to: "{{ groups.oo_first_master.0 }}"
+     register: oauth_consumer_key
+
+   - name: 'Get oauth-consumer-secret'
+     shell: grep oauth_consumer_secret /etc/foreman/settings.yaml | cut -d ' ' -f 2
+     delegate_to: "{{ groups.oo_first_master.0 }}"
+     register: oauth_consumer_secret
+
+   - debug: msg="{{ oauth_consumer_key.stdout }} {{ oauth_consumer_secret.stdout }}"

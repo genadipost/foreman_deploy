@@ -1,0 +1,19 @@
+galaxy_info:
+  author: Genadi Postrilko
+  description: Ansible role to configure epel yum repository
+  issue_tracker_url: https://github.com/genadipost/epel_repositories/issues
+  license: BSD
+  min_ansible_version: 2.3
+  github_branch: master
+  platforms:
+  - name: Fedora
+    versions:
+      - 25
+      - 26
+  - name: EL
+    versions:
+      - 7
+  galaxy_tags:
+    - epel
+    - yum
+dependencies: []

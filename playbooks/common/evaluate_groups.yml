@@ -1,0 +1,72 @@
+---
+- name: Populate config host groups
+  hosts: localhost
+  connection: local
+  become: no
+  gather_facts: no
+  tasks:
+    - name: Evaluate oo_all_hosts
+      add_host:
+        name: "{{ item }}"
+        groups: oo_all_hosts
+      with_items: "{{ g_all_hosts | default([]) }}"
+      changed_when: no
+
+    - name: Evaluate oo_masters
+      add_host:
+        name: "{{ item }}"
+        groups: oo_masters
+      with_items: "{{ g_master_hosts | union(g_new_master_hosts) | default([]) }}"
+      changed_when: no
+
+    - name: Evaluate oo_ui
+      add_host:
+        name: "{{ item }}"
+        groups: oo_ui
+      with_items: "{{ g_ui_hosts | union(g_new_ui_hosts) | default([]) }}"
+      changed_when: no
+
+    - name: Evaluate oo_masters_and_ui
+      add_host:
+        name: "{{ item }}"
+        groups: oo_masters_and_ui
+      with_items: "{{ g_master_hosts | union(g_new_master_hosts) | union(g_ui_hosts) | union(g_new_ui_hosts) | default([]) }}"
+      changed_when: no
+
+    - name: Evaluate oo_masters_to_config
+      add_host:
+        name: "{{ item }}"
+        groups: oo_masters_to_config
+      with_items: "{{ g_new_master_hosts | default(g_master_hosts | default([], true), true) }}"
+      changed_when: no
+
+    - name: Evaluate oo_ui_to_config
+      add_host:
+        name: "{{ item }}"
+        groups: oo_ui_to_config
+      with_items: "{{ g_new_ui_hosts | default(g_ui_hosts | default([], true), true) }}"
+      changed_when: no
+
+    - name: Evaluate oo_first_master
+      add_host:
+         name: "{{ g_master_hosts[0] }}"
+         groups: oo_first_master
+      when: g_master_hosts|length > 0
+      changed_when: no
+
+    - name: Evaluate oo_proxies_to_config
+      add_host:
+        name: "{{ item }}"
+        groups: oo_proxies_to_config
+      with_items: "{{ g_new_proxy_hosts | default(g_proxy_hosts | default([], true), true) }}"
+      changed_when: no
+
+    - debug: msg="{{ g_new_proxy_hosts | default(g_proxy_hosts | default([], true), true) }}"
+
+    - name: Evaluate oo_lb_to_config
+      add_host:
+        name: "{{ item }}"
+        groups: oo_lb_to_config
+      with_items: "{{ g_lb_hosts | default([]) }}"
+      changed_when: no
+

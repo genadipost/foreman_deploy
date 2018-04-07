@@ -1,0 +1,27 @@
+---
+- hosts: masters
+  roles:
+    - { role: genadipost.epel_repositories }
+    - { role: puppet_repositories }
+    - { role: foreman_repositories }
+    - role: foreman_installer
+      scenario: foreman
+      foreman_installer_options:
+          - "--foreman-locations-enabled=true"
+          - "--foreman-initial-location=A"
+          - "--foreman-organizations-enabled=true"
+          - "--foreman-initial-organization=A"
+          - "--foreman-db-manage=false"
+          - "--foreman-db-type={{ foreman_db_type }}"
+          - "--foreman-db-adapter={{ foreman_db_adapter }}"
+          - "--foreman-db-port={{ foreman_db_port }}"
+          - "--foreman-db-host={{ foreman_db_host }}"
+          - "--foreman-db-username={{ foreman_db_username }}"
+          - "--foreman-db-password={{ foreman_db_password }}"
+          - "--foreman-db-database={{ foreman_db_database }}"
+          - "--foreman-proxy-dhcp=false"
+          - "--foreman-proxy-tftp=false"
+          - "--puppet-dns-alt-names=puppet"
+          - "--puppet-dns-alt-names=puppet.{{ ansible_domain }}"
+          - "--puppet-dns-alt-names={{ ansible_fqdn }}"
+          - "--puppet-dns-alt-names=web-foreman.test.local"

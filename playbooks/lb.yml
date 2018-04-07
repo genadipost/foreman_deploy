@@ -1,0 +1,17 @@
+---
+- include: ./common/initialize_groups.yml
+
+- include: ./common/evaluate_groups.yml
+
+- include: ./common/oauth.yml
+
+- name: kek
+  hosts: oo_lb_to_config
+  tasks:
+    - debug: msg="{{ groups.oo_masters_and_ui }}"
+
+- name: Configure lb
+  hosts: oo_lb_to_config
+  roles:
+    - role: foreman_loadbalancer
+      hosts: "{{ groups.oo_masters_and_ui }}"

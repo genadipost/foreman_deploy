@@ -1,0 +1,75 @@
+# Global settings
+#---------------------------------------------------------------------
+global
+    maxconn     {{ foreman_loadbalancer_global_maxconn | default(20000) }}
+    log         /dev/log local0 info
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    user        haproxy
+    group       haproxy
+    daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+#    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          300s
+    timeout server          300s
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 {{ foreman_loadbalancer_default_maxconn | default(20000) }}
+
+listen stats :9000
+    mode http
+    stats enable
+    stats uri /
+
+frontend https-in-ui
+   mode http
+   bind *:5443 ssl crt /etc/ssl/certs/{{ foreman_web_public_hostname }}.pem crt /etc/ssl/certs/{{ foreman_puppet_public_hostname }}.pem
+   
+   acl is_web_client hdr_sub(host) -i {{ foreman_web_public_hostname }}
+   acl is_web_proxies hdr_sub(host) -i {{ foreman_puppet_public_hostname }}
+
+   # always use same backend but with different certificates
+   use_backend foreman-ssl-ui if is_web_client
+   use_backend foreman-ssl-ui if is_web_proxies
+
+frontend https-in-proxy
+   mode http
+   bind *:6443 ssl crt /etc/ssl/certs/{{ foreman_puppet_public_hostname }}.pem
+   
+   default_backend foreman-ssl-proxy
+
+backend foreman-ssl-ui
+   mode http
+   balance roundrobin
+   option ssl-hello-chk
+
+{% for host in hosts %}
+   server {{ host }} {{ host }}:443 ssl verify none
+{% endfor %}
+
+backend foreman-ssl-proxy
+   mode http
+   balance roundrobin
+   option ssl-hello-chk
+
+{% for host in hosts %}
+   server {{ host }} {{ host }}:8443 ssl verify none
+{% endfor %}

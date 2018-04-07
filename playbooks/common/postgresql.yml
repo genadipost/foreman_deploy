@@ -1,0 +1,30 @@
+- hosts: postgresql
+  roles:
+  - role: postgresql
+    postgresql_server_listen: "'*'"
+    postgresql_server_auth:
+    - database: foreman
+      user: foreman
+      address: 0.0.0.0/0
+    postgresql_databases:
+    - name: foreman
+    postgresql_users:
+    - user: foreman
+      password: foreman
+      databases: [foreman]
+      roles: "SUPERUSER"
+
+#    - role: ansible-postgresql
+#      postgresql_conf:
+#        - name: listen_addresses
+#          value: "'*'"
+#      postgresql_pg_hba_conf:
+#         - { type: host,  database: all, user: all, address: "0.0.0.0/0", method: md5 }
+#      postgresql_databases:
+#         - name: foreman
+#      postgresql_users:
+#         - name: foreman
+#           password: foreman
+#           db: foreman
+#           priv: ALL
+

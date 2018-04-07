@@ -1,0 +1,20 @@
+---
+g_lb_hosts: "{{ groups.lb | default([]) }}"
+
+g_master_hosts: "{{ groups.masters | default([]) }}"
+
+g_new_master_hosts: "{{ groups.new_masters | default([]) }}"
+
+g_ui_hosts: "{{ groups.ui | default([]) }}"
+
+g_new_ui_hosts: "{{ groups.new_ui | default([]) }}"
+
+g_proxy_hosts: "{{ groups.proxies | default([]) }}"
+
+g_new_proxy_hosts: "{{ groups.new_proxies | default([]) }}"
+
+g_all_hosts: "{{ g_master_hosts | union(g_new_master_hosts)
+                 | union(g_ui_hosts) | union(g_new_ui_hosts)
+                 | union(g_lb_hosts) | union(g_proxy_hosts)
+                 | union(g_new_proxy_hosts)
+                 | default([]) }}"

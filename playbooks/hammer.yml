@@ -1,0 +1,11 @@
+---
+- name: install hammer
+  hosts: masters
+  roles:
+    - { role: foreman_repositories, foreman_repositories_version: latest }
+    - role: foreman_hammer_cli
+      foreman_hammer_cli_config_path: '~/.hammer/cli.modules.d'
+      foreman_hammer_cli_config_host_url: https://foreman1.test.local/
+      foreman_hammer_cli_config_username: admin
+      foreman_hammer_cli_config_password: 4g2YWKWXD7TH78NP
+

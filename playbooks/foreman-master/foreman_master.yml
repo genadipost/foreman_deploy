@@ -1,0 +1,16 @@
+---
+- hosts: masters
+  roles:
+    - { role: genadipost.epel_repositories }
+    - { role: puppet_repositories }
+    - { role: foreman_repositories }
+    - role: foreman_installer
+      scenario: foreman
+      foreman_installer_options:
+          - "--foreman-locations-enabled=true"
+          - "--foreman-initial-location=A"
+          - "--foreman-organizations-enabled=true"
+          - "--foreman-initial-organization=A"
+          - "--foreman-proxy-dhcp=false"
+          - "--foreman-proxy-tftp=false"
+

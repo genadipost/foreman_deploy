@@ -1,0 +1,6 @@
+---
+- name: Create Foreman certificates for proxy hosts
+  hosts: oo_proxies_to_config
+  roles:
+  - role: foreman_proxy_certificates
+    foreman_ca_host: "{{ groups.oo_first_master.0 }}"
